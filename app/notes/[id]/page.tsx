@@ -3,13 +3,15 @@ import { FaCheck } from "react-icons/fa"
 import { FaNoteSticky, FaXmark } from "react-icons/fa6"
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { redirect, useParams } from "next/navigation";
+import { redirect, useParams ,useRouter} from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Suspense } from "react";
 
 
-export default function UpdateNote(){
+ function UpdateNoteContent(){
     const {status} = useSession()
+    const router = useRouter();
     const {id} = useParams()
     const [noteDetails,setNoteDetails] = useState({
         _id:"",title:"",description:"",color:"",userMail:"",createdAt:"",updatedAt:""
@@ -37,7 +39,7 @@ export default function UpdateNote(){
             const res = await fetch(`/api/notes/${id}`,{method:"PUT",body:JSON.stringify(noteDetails)})
             if(res.status == 200){
                 toast.success("Note Udated Successfully")
-                redirect('/notes')
+                router.push('/notes')
             }
         }
     }
@@ -48,7 +50,7 @@ export default function UpdateNote(){
           }
           
           if(status=="unauthenticated"){
-            redirect('/login')
+           router.push('/login')
           }
     return (
        <div className="md:mx-40 m-5">
@@ -85,4 +87,12 @@ export default function UpdateNote(){
             </div>
         </div>
     )
+}
+
+export default function UpdateNote() {
+    return (
+        <Suspense fallback={<p>Loading note...</p>}>
+            <UpdateNoteContent />
+        </Suspense>
+    );
 }
